@@ -89,7 +89,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const video = document.getElementById("video");
 
   const snippets = {};
-  const numSnippets = 4;
+  const numSnippets = 9;
 
   function makeSnippets(num) {
     let source;
@@ -99,7 +99,7 @@ document.addEventListener("DOMContentLoaded", () => {
     let index = 1;
     for (let i = 1; i <= rows; i++) {
       for (let j = 1; j <= cols; j++) {
-        source = [video.width * (1 - 1 / j), video.height * (1 - 1 / i), video.width / rows, video.height / cols];
+        source = [video.width * (1 - j / cols), video.height * (1 - i / rows), video.width / rows, video.height / cols];
 
         pos = [source[0], source[1]];
 
@@ -110,18 +110,18 @@ document.addEventListener("DOMContentLoaded", () => {
   }
   makeSnippets(numSnippets);
 
-  const q1 = [0, 0, 320, 180];
-  const q2 = [320, 0, 320, 180];
-  const q3 = [0, 180, 320, 180];
-  const q4 = [320, 180, 320, 180];
-
-  const p1 = [0, 0];
-  const p2 = [320, 0];
-  const p3 = [0, 180];
-  const p4 = [320, 180];
+  // const q1 = [0, 0, 320, 180];
+  // const q2 = [320, 0, 320, 180];
+  // const q3 = [0, 180, 320, 180];
+  // const q4 = [320, 180, 320, 180];
+  //
+  // const p1 = [0, 0];
+  // const p2 = [320, 0];
+  // const p3 = [0, 180];
+  // const p4 = [320, 180];
   const positions = Object.values(snippets).map(snip => snip.pos);
 
-  const widthHeight = [320, 180];
+  const widthHeight = [video.width / Math.sqrt(numSnippets), video.height / Math.sqrt(numSnippets)];
 
   function drawVideo() {
     ctx.clearRect(0, 0, W, H);
