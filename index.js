@@ -9,7 +9,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const video = document.getElementById("video");
 
   const snippets = {};
-  const numSnippets = 9;
+  const originalPositions = {};
+  const numSnippets = 36;
 
   function makeSnippets(num) {
     let source;
@@ -29,21 +30,19 @@ document.addEventListener("DOMContentLoaded", () => {
         pos = [source[0], source[1]];
 
         snippets[index] = { source, pos };
+        originalPositions[index] = [pos[0], pos[1]];
         index++;
       }
     }
   }
   makeSnippets(numSnippets);
 
-  // const q1 = [0, 0, 320, 180];
-  // const q2 = [320, 0, 320, 180];
-  // const q3 = [0, 180, 320, 180];
-  // const q4 = [320, 180, 320, 180];
-  //
-  // const p1 = [0, 0];
-  // const p2 = [320, 0];
-  // const p3 = [0, 180];
-  // const p4 = [320, 180];
+  function randomPos() {
+    let x = Math.floor(Math.random() * (canvasEl.width - 100));
+    let y = Math.floor(Math.random() * (canvasEl.height - 100));
+    return [x, y];
+  }
+
   const positions = Object.values(snippets).map(snip => snip.pos);
 
   const widthHeight = [
@@ -62,11 +61,6 @@ document.addEventListener("DOMContentLoaded", () => {
         ...widthHeight
       );
     }
-    // ctx.drawImage(video, ...q1, ...p1, ...widthHeight);
-    // ctx.drawImage(video, ...q2, ...p2, ...widthHeight);
-    // ctx.drawImage(video, ...q3, ...p3, ...widthHeight);
-    // ctx.drawImage(video, ...q4, ...p4, ...widthHeight);
-    // ctx.drawImage(video, 0, 0, 640, 360, 0, 0, 320, 240);
   }
 
   let startClick;
@@ -108,26 +102,10 @@ document.addEventListener("DOMContentLoaded", () => {
     startClick = [e.clientX, e.clientY];
     console.log("down!");
     beingDragged = withinBounds(...startClick);
-    console.log(snippets);
-    console.log(beingDragged);
+    if (beingDragged === null) {
+      return;
+    }
     startPos = snippets[beingDragged].pos.slice(0);
-    // switch (beingDragged) {
-    //   case 0:
-    //     startPos = p1.slice(0);
-    //     break;
-    //   case 1:
-    //     startPos = p2.slice(0);
-    //     break;
-    //   case 2:
-    //     startPos = p3.slice(0);
-    //     break;
-    //   case 3:
-    //     startPos = p4.slice(0);
-    //     break;
-    //   default:
-    //     startPos = null;
-    //     break;
-    // }
     document.addEventListener("mousemove", onMouseMove);
   });
 
@@ -135,6 +113,29 @@ document.addEventListener("DOMContentLoaded", () => {
     e.preventDefault();
     document.removeEventListener("mousemove", onMouseMove);
     beingDragged = null;
+  });
+
+  const scramble = document.getElementById("scramble");
+
+  scramble.addEventListener("click", () => {
+    let randomPosition;
+    for (var key in snippets) {
+      if (!snippets.hasOwnProperty(key)) continue;
+      randomPosition = randomPos();
+      snippets[key].pos[0] = randomPosition[0];
+      snippets[key].pos[1] = randomPosition[1];
+    }
+  });
+
+  const reform = document.getElementById("reform");
+
+  reform.addEventListener("click", e => {
+    e.stopPropagation();
+    for (var key in snippets) {
+      if (!snippets.hasOwnProperty(key)) continue;
+      snippets[key].pos[0] = originalPositions[key][0];
+      snippets[key].pos[1] = originalPositions[key][1];
+    }
   });
 
   function playVideo() {
