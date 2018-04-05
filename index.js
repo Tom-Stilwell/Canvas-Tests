@@ -6,229 +6,138 @@ document.addEventListener("DOMContentLoaded", () => {
   canvasEl.width = W;
   canvasEl.height = H;
 
-  // ctx.globalCompositeOperation = "source-out";
-  const colors = [
-    "#80ff80",
-    "#ff80d5",
-    "#ff8533",
-    "#ffff4d",
-    "#84e1e1",
-    "#ff99bb",
-    "#ff531a",
-    "#4d4dff"
-  ];
+  const video = document.getElementById("video");
 
-  function randomColor() {
-    return colors[Math.floor(Math.random() * colors.length)];
-  }
+  const snippets = {};
+  const numSnippets = 4;
 
-  const centers = [];
-  const stems = [];
-  const petals = [];
+  function makeSnippets(num) {
+    let source;
+    let pos;
+    let rows = Math.sqrt(num);
+    let cols = Math.sqrt(num);
+    let index = 1;
+    for (let i = 1; i <= rows; i++) {
+      for (let j = 1; j <= cols; j++) {
+        source = [
+          video.width * (1 - 1 / j),
+          video.height * (1 - 1 / i),
+          video.width / rows,
+          video.height / cols
+        ];
 
-  function makeFlowers(num) {
-    let center, stem, petal1, petal2, petal3, petal4;
-    for (let i = 0; i < num; i++) {
-      center = {
-        x: Math.floor(Math.random() * (W - 200)) + 100,
-        y: Math.floor(Math.random() * 200) + (H - 300),
-        maxRadius: Math.floor(Math.random() * 10) + 5,
-        color: randomColor()
-      };
+        pos = [source[0], source[1]];
 
-      stem = {
-        x: center.x - center.maxRadius / 10,
-        y: center.y + center.maxRadius / 2,
-        width: center.maxRadius / 5,
-        maxHeight: H - center.y
-      };
-
-      petal1 = {
-        start: [center.x + center.maxRadius, center.y],
-        maxPoint1: [
-          center.x + 5 * center.maxRadius,
-          center.y + 5 * center.maxRadius
-        ],
-        maxPoint2: [center.x + 5 * center.maxRadius, center.y],
-        maxPoint3: [
-          center.x + 5 * center.maxRadius,
-          center.y - 5 * center.maxRadius
-        ]
-      };
-
-      petal2 = {
-        start: [center.x, center.y + center.maxRadius],
-        maxPoint1: [
-          center.x - 5 * center.maxRadius,
-          center.y + 5 * center.maxRadius
-        ],
-        maxPoint2: [center.x, center.y + 5 * center.maxRadius],
-        maxPoint3: [
-          center.x + 5 * center.maxRadius,
-          center.y + 5 * center.maxRadius
-        ]
-      };
-
-      petal3 = {
-        start: [center.x - center.maxRadius, center.y],
-        maxPoint1: [
-          center.x - 5 * center.maxRadius,
-          center.y + 5 * center.maxRadius
-        ],
-        maxPoint2: [center.x - 5 * center.maxRadius, center.y],
-        maxPoint3: [
-          center.x - 5 * center.maxRadius,
-          center.y - 5 * center.maxRadius
-        ]
-      };
-
-      petal4 = {
-        start: [center.x, center.y - center.maxRadius],
-        maxPoint1: [
-          center.x - 5 * center.maxRadius,
-          center.y - 5 * center.maxRadius
-        ],
-        maxPoint2: [center.x, center.y - 5 * center.maxRadius],
-        maxPoint3: [
-          center.x + 5 * center.maxRadius,
-          center.y - 5 * center.maxRadius
-        ]
-      };
-
-      centers.push(center);
-      stems.push(stem);
-      petals.push(petal1, petal2, petal3, petal4);
-    }
-  }
-
-  makeFlowers(20);
-
-  // stem
-  ctx.fillStyle = "green";
-
-  const stemsInc = new Array(stems.length);
-
-  for (let i = 0; i < stems.length; i++) {
-    stemsInc[i] = {};
-    stemsInc[i].x = stems[i].x;
-    stemsInc[i].y = stems[i].y;
-    stemsInc[i].width = stems[i].width;
-    stemsInc[i].height = 0;
-  }
-
-  function drawStems() {
-    let stem;
-    for (let i = 0; i < stemsInc.length; i++) {
-      stem = stemsInc[i];
-
-      if (Math.round(stem.height) === stems[i].maxHeight) {
-        continue;
-      } else {
-        ctx.fillRect(stem.x, stem.y, stem.width, stem.height);
-        stem.height += (stems[i].maxHeight - stem.height) / 10;
+        snippets[index] = { source, pos };
+        index++;
       }
     }
   }
+  makeSnippets(numSnippets);
 
-  ctx.save();
-  ctx.beginPath();
+  const q1 = [0, 0, 320, 180];
+  const q2 = [320, 0, 320, 180];
+  const q3 = [0, 180, 320, 180];
+  const q4 = [320, 180, 320, 180];
 
-  const petalsInc = new Array(petals.length);
+  const p1 = [0, 0];
+  const p2 = [320, 0];
+  const p3 = [0, 180];
+  const p4 = [320, 180];
+  const positions = Object.values(snippets).map(snip => snip.pos);
 
-  for (let i = 0; i < petals.length; i++) {
-    petalsInc[i] = {};
-    petalsInc[i].start = petals[i].start.slice();
-    petalsInc[i].point1 = petals[i].start.slice();
-    petalsInc[i].point2 = petals[i].start.slice();
-    petalsInc[i].point3 = petals[i].start.slice();
+  const widthHeight = [320, 180];
+
+  function drawVideo() {
+    ctx.clearRect(0, 0, W, H);
+
+    for (let i = 1; i <= numSnippets; i++) {
+      ctx.drawImage(
+        video,
+        ...snippets[i].source,
+        ...snippets[i].pos,
+        ...widthHeight
+      );
+    }
+    // ctx.drawImage(video, ...q1, ...p1, ...widthHeight);
+    // ctx.drawImage(video, ...q2, ...p2, ...widthHeight);
+    // ctx.drawImage(video, ...q3, ...p3, ...widthHeight);
+    // ctx.drawImage(video, ...q4, ...p4, ...widthHeight);
+    // ctx.drawImage(video, 0, 0, 640, 360, 0, 0, 320, 240);
   }
 
-  function drawPetals() {
-    let petalInc;
-    let petal;
-    for (let i = 0; i < petalsInc.length; i++) {
-      petalInc = petalsInc[i];
-      petal = petals[i];
+  let startClick;
+  let beingDragged;
+  let offsetX;
+  let offsetY;
+  let startPos;
+  let currentSnip;
 
-      if (Math.round(petalInc.point1[0]) === petals[i].maxPoint1[0]) {
-        continue;
-      } else {
-        makePetal(petalInc);
-
-        petalInc.point1[0] += (petal.maxPoint1[0] - petal.start[0]) / 250;
-        petalInc.point1[1] += (petal.maxPoint1[1] - petal.start[1]) / 250;
-        petalInc.point2[0] += (petal.maxPoint2[0] - petal.start[0]) / 250;
-        petalInc.point2[1] += (petal.maxPoint2[1] - petal.start[1]) / 250;
-        petalInc.point3[0] += (petal.maxPoint3[0] - petal.start[0]) / 250;
-        petalInc.point3[1] += (petal.maxPoint3[1] - petal.start[1]) / 250;
+  function withinBounds(x, y) {
+    let pos;
+    for (let i = 0; i < positions.length; i++) {
+      pos = positions[i];
+      if (
+        x > pos[0] &&
+        x < pos[0] + widthHeight[0] &&
+        y > pos[1] &&
+        y < pos[1] + widthHeight[1]
+      ) {
+        return i + 1;
       }
     }
+    return null;
   }
 
-  function makePetal(petal) {
-    ctx.save();
-    ctx.beginPath();
-    ctx.moveTo(petal.start[0], petal.start[1]);
-    ctx.quadraticCurveTo(
-      petal.point1[0],
-      petal.point1[1],
-      petal.point2[0],
-      petal.point2[1]
-    );
-    ctx.quadraticCurveTo(
-      petal.point3[0],
-      petal.point3[1],
-      petal.start[0],
-      petal.start[1]
-    );
-    ctx.closePath();
-    ctx.fillStyle = randomColor();
-    ctx.fill();
-    ctx.restore();
-  }
-
-  // center
-
-  const centersInc = new Array(centers.length);
-
-  for (let i = 0; i < centers.length; i++) {
-    centersInc[i] = centers[i];
-    centersInc[i].radius = 0;
-  }
-
-  function makeCenter(x, y, radius, color) {
-    ctx.save();
-    ctx.beginPath();
-    ctx.arc(x, y, radius, 0, Math.PI * 2, false);
-    ctx.closePath();
-    ctx.fillStyle = color;
-    ctx.fill();
-    ctx.restore();
-  }
-
-  function drawCenters() {
-    let center;
-    let centerInc;
-    for (let i = 0; i < centersInc.length; i++) {
-      center = centers[i];
-      centerInc = centersInc[i];
-      if (Math.round(centerInc.radius) === center.maxRadius) {
-        // alert("centers");
-        continue;
-      } else {
-        makeCenter(centerInc.x, centerInc.y, centerInc.radius, centerInc.color);
-        centerInc.radius += (center.maxRadius - centerInc.radius) / 100;
-      }
+  function onMouseMove(event) {
+    event.preventDefault();
+    if (event.clientX < 0 || event.clientY < 0 || beingDragged === null) {
+      return;
     }
+    offsetX = event.clientX - startClick[0];
+    offsetY = event.clientY - startClick[1];
+    currentSnip = snippets[beingDragged];
+    currentSnip.pos[0] = startPos[0] + offsetX;
+    currentSnip.pos[1] = startPos[1] + offsetY;
   }
 
-  function draw() {
-    drawCenters();
-    drawStems();
-    drawPetals();
-    // ctx.clearRect(0, 0, W, H);
-    requestAnimationFrame(draw);
+  document.addEventListener("mousedown", e => {
+    startClick = [e.clientX, e.clientY];
+    console.log("down!");
+    beingDragged = withinBounds(...startClick);
+    console.log(snippets);
+    console.log(beingDragged);
+    startPos = snippets[beingDragged].pos.slice(0);
+    // switch (beingDragged) {
+    //   case 0:
+    //     startPos = p1.slice(0);
+    //     break;
+    //   case 1:
+    //     startPos = p2.slice(0);
+    //     break;
+    //   case 2:
+    //     startPos = p3.slice(0);
+    //     break;
+    //   case 3:
+    //     startPos = p4.slice(0);
+    //     break;
+    //   default:
+    //     startPos = null;
+    //     break;
+    // }
+    document.addEventListener("mousemove", onMouseMove);
+  });
+
+  document.addEventListener("mouseup", e => {
+    e.preventDefault();
+    document.removeEventListener("mousemove", onMouseMove);
+    beingDragged = null;
+  });
+
+  function playVideo() {
+    drawVideo();
+    requestAnimationFrame(playVideo);
   }
 
-  requestAnimationFrame(draw);
+  requestAnimationFrame(playVideo);
 });
