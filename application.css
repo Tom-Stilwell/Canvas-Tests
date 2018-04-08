@@ -7,11 +7,18 @@ video {
 #scramble {
   position: absolute;
   top: 50px;
-  left: 50px;
+  left: 800px;
 }
 
 #reform {
   position: absolute;
   top: 100px;
-  left: 50px;
+  left: 800px;
+}
+
+#number {
+  position: absolute;
+  top: 150px;
+  left: 800px;
+  display: inline;
 }

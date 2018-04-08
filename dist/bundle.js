@@ -90,7 +90,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const snippets = {};
   const originalPositions = {};
-  const numSnippets = 36;
+  let numSnippets = 144;
+  let movementSpeed = 50;
 
   function makeSnippets(num) {
     let source;
@@ -126,6 +127,11 @@ document.addEventListener("DOMContentLoaded", () => {
     ctx.clearRect(0, 0, W, H);
 
     for (let i = 1; i <= numSnippets; i++) {
+      if (snippets[i].incX && (Math.floor(snippets[i].pos[0]) <= snippets[i].maxX && snippets[i].incX > 0 || Math.floor(snippets[i].pos[0]) >= snippets[i].maxX && snippets[i].incX < 0)) {
+        debugger;
+        snippets[i].pos[0] += snippets[i].incX;
+        snippets[i].pos[1] += snippets[i].incY;
+      }
       ctx.drawImage(video, ...snippets[i].source, ...snippets[i].pos, ...widthHeight);
     }
   }
@@ -161,6 +167,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   document.addEventListener("mousedown", e => {
+    e.preventDefault();
     startClick = [e.clientX, e.clientY];
     console.log("down!");
     beingDragged = withinBounds(...startClick);
@@ -184,8 +191,10 @@ document.addEventListener("DOMContentLoaded", () => {
     for (var key in snippets) {
       if (!snippets.hasOwnProperty(key)) continue;
       randomPosition = randomPos();
-      snippets[key].pos[0] = randomPosition[0];
-      snippets[key].pos[1] = randomPosition[1];
+      snippets[key].maxX = randomPosition[0];
+      snippets[key].maxY = randomPosition[1];
+      snippets[key].incX = (snippets[key].maxX - snippets[key].pos[0]) / movementSpeed;
+      snippets[key].incY = (snippets[key].maxY - snippets[key].pos[1]) / movementSpeed;
     }
   });
 
@@ -195,10 +204,19 @@ document.addEventListener("DOMContentLoaded", () => {
     e.stopPropagation();
     for (var key in snippets) {
       if (!snippets.hasOwnProperty(key)) continue;
-      snippets[key].pos[0] = originalPositions[key][0];
-      snippets[key].pos[1] = originalPositions[key][1];
+      snippets[key].maxX = originalPositions[key][0];
+      snippets[key].maxY = originalPositions[key][1];
+      snippets[key].incX = (snippets[key].maxX - snippets[key].pos[0]) / movementSpeed;
+      snippets[key].incY = (snippets[key].maxY - snippets[key].pos[1]) / movementSpeed;
     }
   });
+
+  const number = document.getElementById("number");
+
+  // number.addEventListener("change", e => {
+  //   numSnippets = number.value;
+  //   makeSnippets(numSnippets);
+  // });
 
   function playVideo() {
     drawVideo();
