@@ -11,7 +11,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const snippets = {};
   const originalPositions = {};
   let numSnippets = 144;
-  let movementSpeed = 50;
+  let movementSpeed = 100;
 
   function makeSnippets(num) {
     let source;
@@ -57,10 +57,10 @@ document.addEventListener("DOMContentLoaded", () => {
     for (let i = 1; i <= numSnippets; i++) {
       if (
         snippets[i].incX &&
-        ((Math.floor(snippets[i].pos[0]) <= snippets[i].maxX &&
-          snippets[i].incX > 0) ||
-          (Math.floor(snippets[i].pos[0]) >= snippets[i].maxX &&
-            snippets[i].incX < 0))
+        ((snippets[i].pos[0] <= snippets[i].maxX && snippets[i].incX > 0) ||
+          (snippets[i].pos[0] >= snippets[i].maxX && snippets[i].incX < 0)) &&
+        ((snippets[i].pos[1] <= snippets[i].maxY && snippets[i].incY > 0) ||
+          (snippets[i].pos[1] >= snippets[i].maxY && snippets[i].incY < 0))
       ) {
         debugger;
         snippets[i].pos[0] += snippets[i].incX;
