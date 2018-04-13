@@ -79,6 +79,11 @@
 /***/ (function(module, exports) {
 
 document.addEventListener("DOMContentLoaded", () => {
+  var getOpenRecalls = function () {
+    console.log("recalls received");
+  };
+
+  getOpenRecalls();
   const canvasEl = document.getElementById("test-canvas");
   const ctx = canvasEl.getContext("2d");
   let W = window.innerWidth;
@@ -128,7 +133,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     for (let i = 1; i <= numSnippets; i++) {
       if (snippets[i].incX && (snippets[i].pos[0] <= snippets[i].maxX && snippets[i].incX > 0 || snippets[i].pos[0] >= snippets[i].maxX && snippets[i].incX < 0) && (snippets[i].pos[1] <= snippets[i].maxY && snippets[i].incY > 0 || snippets[i].pos[1] >= snippets[i].maxY && snippets[i].incY < 0)) {
-        debugger;
         snippets[i].pos[0] += snippets[i].incX;
         snippets[i].pos[1] += snippets[i].incY;
       }

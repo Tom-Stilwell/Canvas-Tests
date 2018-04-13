@@ -4,10 +4,15 @@ video {
   display: none;
 }
 
+button#scramble {
+  color: red;
+}
+
 #scramble {
   position: absolute;
   top: 50px;
   left: 800px;
+  color: blue;
 }
 
 #reform {
