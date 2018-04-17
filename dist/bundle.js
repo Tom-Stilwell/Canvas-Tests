@@ -106,7 +106,7 @@ document.addEventListener("DOMContentLoaded", () => {
     return factors[Math.floor(Math.random() * factors.length)] * 0.25;
   }
 
-  const chars = [];
+  let chars = [];
   const counts = {};
   // let char = randomChar();
   // let pos = [0, 0];
@@ -116,7 +116,7 @@ document.addEventListener("DOMContentLoaded", () => {
   ctx.font = `${charSize}px Orbitron`;
 
   for (let i = 0; i < W; i += charSize) {
-    makeChar(i, 0, randomVel(), Math.random() * H, color);
+    makeChar(i, 0, randomVel(), Math.random() * (H - 200) + 400, color);
     counts[i] = 1;
   }
 
@@ -135,19 +135,36 @@ document.addEventListener("DOMContentLoaded", () => {
     let char;
     for (let i = 0; i < chars.length; i++) {
       char = chars[i];
-      if (char.pos[1] > char.max) {
-        char.value = "";
+      if (char === null) {
+        continue;
       }
-      if (char.pos[1] + 2 * char.vel > char.max) {
+      // if (char.pos[1] > char.max) {
+      //   chars = chars.slice(0, i).concat(chars.slice(i + 1, chars.length));
+      //   makeChar(char.pos[0], 0, char.vel, char.max);
+      // }
+      if (char.pos[1] + 5 * char.vel > char.max) {
         ctx.fillStyle = "white";
       } else {
         ctx.fillStyle = "lime";
       }
       ctx.fillText(char.value, ...char.pos);
       char.pos[1] += char.vel;
-      if (char.pos[1] == 20) {
+
+      if (char.pos[1] === 20 && counts[char.pos[0]]++ < 20) {
         makeChar(char.pos[0], 0, char.vel, char.max);
       }
+
+      if (char.pos[1] > char.max && char.value !== "") {
+        makeChar(char.pos[0], 0, char.vel, char.max);
+        chars[i] = null;
+      }
+      // if (char.pos[1] === 20) {
+      //   if (counts[char.pos[0]] < 10) {
+      //     counts[char.pos[0]]++;
+      //     makeChar(char.pos[0], 0, char.vel, char.max);
+      //   }
+      // }
+
       // if (char.pos[1] == 20) {
       //   if (counts[char.pos[0]]++ % 40 < 20) {
       //     makeChar(char.pos[0], 0, char.vel, char.max);
@@ -156,6 +173,16 @@ document.addEventListener("DOMContentLoaded", () => {
       //   }
       // }
     }
+
+    // for (var key in counts) {
+    //   if (counts[key] >= 10) {
+    //     counts[key]++;
+    //     if (counts[key] >= 21) {
+    //       makeChar(key, 0, randomVel(), Math.random() * H);
+    //       counts[key] = 0;
+    //     }
+    //   }
+    // }
   }
 
   function animate() {
