@@ -214,7 +214,7 @@ document.addEventListener("DOMContentLoaded", () => {
     reformVideo(movementSpeed);
     setTimeout(() => {
       reformVideo(20);
-    }, 4000);
+    }, 5000);
   });
 
   const number = document.getElementById("number");
