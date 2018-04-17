@@ -116,11 +116,13 @@ document.addEventListener("DOMContentLoaded", () => {
   ctx.font = `${charSize}px Orbitron`;
 
   for (let i = 0; i < W; i += charSize) {
-    makeChar(i, 0, randomVel(), Math.random() * (H - 200) + 400, color);
+    makeChar(i, 0, randomVel(), Math.random() * (H - 200) + 400);
     counts[i] = 1;
   }
 
-  function makeChar(posX, posY, vel, max, fill) {
+  function makeChar(posX, posY, vel, max) {
+    counts[posX]++;
+    let fill = Math.floor(255 * (1 - (counts[posX] - 1) % 20 / 20));
     chars.push({
       value: randomChar(),
       pos: [posX, posY],
@@ -142,19 +144,21 @@ document.addEventListener("DOMContentLoaded", () => {
       //   chars = chars.slice(0, i).concat(chars.slice(i + 1, chars.length));
       //   makeChar(char.pos[0], 0, char.vel, char.max);
       // }
+      ctx.save();
       if (char.pos[1] + 5 * char.vel > char.max) {
         ctx.fillStyle = "white";
       } else {
-        ctx.fillStyle = "lime";
+        ctx.fillStyle = `rgb(0, ${char.fill}, 0)`;
       }
       ctx.fillText(char.value, ...char.pos);
+      ctx.restore();
       char.pos[1] += char.vel;
 
-      if (char.pos[1] === 20 && counts[char.pos[0]]++ < 20) {
+      if (char.pos[1] === 20 && counts[char.pos[0]] < 20) {
         makeChar(char.pos[0], 0, char.vel, char.max);
       }
 
-      if (char.pos[1] > char.max && char.value !== "") {
+      if (char.pos[1] > char.max) {
         makeChar(char.pos[0], 0, char.vel, char.max);
         chars[i] = null;
       }
