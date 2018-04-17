@@ -6,7 +6,8 @@ document.addEventListener("DOMContentLoaded", () => {
   canvasEl.width = W;
   canvasEl.height = H;
 
-  const charSize = 20;
+  const charSize = Math.round(W / 70);
+  const strandLength = Math.round(H / 30);
   const color = [0, 255, 0];
 
   const characters = "1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ!@#$%^&*()";
@@ -18,33 +19,44 @@ document.addEventListener("DOMContentLoaded", () => {
   function randomVel() {
     let factors = [];
 
-    for (let i = 1; i <= 10; i++) {
+    for (let i = 1; i <= 4; i += 0.1) {
+      i = Math.round(10 * i) / 10;
       if (charSize % i === 0) {
         factors.push(i);
       }
     }
-    return factors[Math.floor(Math.random() * factors.length)] * 0.25;
+
+    return factors[Math.floor(Math.random() * factors.length)] * 0.5;
   }
+
+  // function randomVel() {
+  //   return (Math.floor(Math.random() * 90) + 10) * 0.5;
+  // }
 
   let chars = {};
   const counts = {};
   let id = 0;
-  // let char = randomChar();
-  // let pos = [0, 0];
-  // let velocity = 2;
+
   ctx.fillStyle = "lime";
   ctx.textBaseline = "top";
   ctx.font = `${charSize}px Orbitron`;
 
   for (let i = 0; i < W; i += charSize) {
-    makeChar(i, 0, randomVel(), Math.random() * (H - 200) + 400);
+    makeChar(
+      i,
+      0,
+      randomVel(),
+      Math.random() * (H - charSize * strandLength) + charSize * strandLength
+    );
     counts[i] = 1;
   }
 
   function makeChar(posX, posY, vel, max) {
     counts[posX]++;
     id++;
-    let fill = Math.floor(255 * (1 - ((counts[posX] - 1) % 20) / 20));
+    let fill = Math.floor(
+      255 * (1 - ((counts[posX] - 1) % strandLength) / strandLength)
+    );
     chars[id] = {
       id,
       value: randomChar(),
@@ -57,25 +69,31 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function draw() {
     ctx.clearRect(0, 0, W, H);
+
+    let switcher = chars[Math.floor(Math.random() * 400 + id - 400)];
+
+    if (switcher !== undefined) {
+      switcher.value = randomChar();
+    }
+
     let char;
     for (var key in chars) {
       if (!chars.hasOwnProperty(key)) continue;
+
       char = chars[key];
-      // if (char.pos[1] > char.max) {
-      //   chars = chars.slice(0, i).concat(chars.slice(i + 1, chars.length));
-      //   makeChar(char.pos[0], 0, char.vel, char.max);
-      // }
       ctx.save();
+
       if (char.pos[1] + 5 * char.vel > char.max) {
         ctx.fillStyle = "white";
       } else {
         ctx.fillStyle = `rgb(0, ${char.fill}, 0)`;
       }
+
       ctx.fillText(char.value, ...char.pos);
       ctx.restore();
       char.pos[1] += char.vel;
 
-      if (char.pos[1] === 20 && counts[char.pos[0]] < 20) {
+      if (char.pos[1] === charSize && counts[char.pos[0]] < strandLength) {
         makeChar(char.pos[0], 0, char.vel, char.max);
       }
 
@@ -83,31 +101,7 @@ document.addEventListener("DOMContentLoaded", () => {
         makeChar(char.pos[0], 0, char.vel, char.max);
         delete chars[char.id];
       }
-      // if (char.pos[1] === 20) {
-      //   if (counts[char.pos[0]] < 10) {
-      //     counts[char.pos[0]]++;
-      //     makeChar(char.pos[0], 0, char.vel, char.max);
-      //   }
-      // }
-
-      // if (char.pos[1] == 20) {
-      //   if (counts[char.pos[0]]++ % 40 < 20) {
-      //     makeChar(char.pos[0], 0, char.vel, char.max);
-      //   } else {
-      //     makeChar(char.pos[0], -100, char.vel, char.max);
-      //   }
-      // }
     }
-
-    // for (var key in counts) {
-    //   if (counts[key] >= 10) {
-    //     counts[key]++;
-    //     if (counts[key] >= 21) {
-    //       makeChar(key, 0, randomVel(), Math.random() * H);
-    //       counts[key] = 0;
-    //     }
-    //   }
-    // }
   }
 
   function animate() {
