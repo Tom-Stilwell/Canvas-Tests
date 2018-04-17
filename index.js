@@ -109,15 +109,13 @@ document.addEventListener("DOMContentLoaded", () => {
     currentSnip.pos[1] = startPos[1] + offsetY;
   }
 
-  function reformVideo() {
+  function reformVideo(speed) {
     for (var key in snippets) {
       if (!snippets.hasOwnProperty(key)) continue;
       snippets[key].maxX = originalPositions[key][0];
       snippets[key].maxY = originalPositions[key][1];
-      snippets[key].incX =
-        (snippets[key].maxX - snippets[key].pos[0]) / movementSpeed;
-      snippets[key].incY =
-        (snippets[key].maxY - snippets[key].pos[1]) / movementSpeed;
+      snippets[key].incX = (snippets[key].maxX - snippets[key].pos[0]) / speed;
+      snippets[key].incY = (snippets[key].maxY - snippets[key].pos[1]) / speed;
     }
   }
 
@@ -159,8 +157,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
   reform.addEventListener("click", e => {
     e.stopPropagation();
-    reformVideo();
-    setTimeout(reformVideo, 5000);
+    reformVideo(movementSpeed);
+    setTimeout(() => {
+      reformVideo(20);
+    }, 4000);
   });
 
   const number = document.getElementById("number");
