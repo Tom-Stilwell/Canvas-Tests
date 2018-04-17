@@ -15,7 +15,14 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function randomVel() {
-    return Math.random() * 3;
+    let factors = [];
+
+    for (let i = 1; i <= 10; i++) {
+      if (charSize % i === 0) {
+        factors.push(i);
+      }
+    }
+    return factors[Math.floor(Math.random() * factors.length)] * 0.25;
   }
 
   const chars = [];
@@ -27,14 +34,15 @@ document.addEventListener("DOMContentLoaded", () => {
   ctx.font = `${charSize}px Orbitron`;
 
   for (let i = 0; i < W; i += charSize) {
-    makeChar(i, randomVel());
+    makeChar(i, randomVel(), Math.random() * H);
   }
 
-  function makeChar(posX, vel) {
+  function makeChar(posX, vel, max) {
     chars.push({
       value: randomChar(),
       pos: [posX, 0],
-      vel
+      vel,
+      max
     });
   }
 
@@ -43,8 +51,14 @@ document.addEventListener("DOMContentLoaded", () => {
     let char;
     for (let i = 0; i < chars.length; i++) {
       char = chars[i];
+      if (char.pos[1] > char.max) {
+        char.value = "";
+      }
       ctx.fillText(char.value, ...char.pos);
       char.pos[1] += char.vel;
+      if (char.pos[1] == 20) {
+        makeChar(char.pos[0], char.vel, char.max);
+      }
     }
   }
 
