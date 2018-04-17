@@ -106,8 +106,9 @@ document.addEventListener("DOMContentLoaded", () => {
     return factors[Math.floor(Math.random() * factors.length)] * 0.25;
   }
 
-  let chars = [];
+  let chars = {};
   const counts = {};
+  let id = 0;
   // let char = randomChar();
   // let pos = [0, 0];
   // let velocity = 2;
@@ -122,24 +123,24 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function makeChar(posX, posY, vel, max) {
     counts[posX]++;
+    id++;
     let fill = Math.floor(255 * (1 - (counts[posX] - 1) % 20 / 20));
-    chars.push({
+    chars[id] = {
+      id,
       value: randomChar(),
       pos: [posX, posY],
       vel,
       max,
       fill
-    });
+    };
   }
 
   function draw() {
     ctx.clearRect(0, 0, W, H);
     let char;
-    for (let i = 0; i < chars.length; i++) {
-      char = chars[i];
-      if (char === null) {
-        continue;
-      }
+    for (var key in chars) {
+      if (!chars.hasOwnProperty(key)) continue;
+      char = chars[key];
       // if (char.pos[1] > char.max) {
       //   chars = chars.slice(0, i).concat(chars.slice(i + 1, chars.length));
       //   makeChar(char.pos[0], 0, char.vel, char.max);
@@ -160,8 +161,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       if (char.pos[1] > char.max) {
         makeChar(char.pos[0], 0, char.vel, char.max);
-        chars = chars.slice(0, i).concat(chars.slice(i + 1, chars.length));
-        i--;
+        delete chars[char.id];
       }
       // if (char.pos[1] === 20) {
       //   if (counts[char.pos[0]] < 10) {
