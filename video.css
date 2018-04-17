@@ -1,0 +1,38 @@
+video {
+  position: absolute;
+  top: 0;
+  display: none;
+}
+
+.instructions {
+  font-size: 24px;
+  position: absolute;
+  left: 800px;
+  top: 20px;
+}
+
+button {
+  position: absolute;
+  font-size: 20px;
+  border-radius: 4px;
+}
+
+button:hover {
+  cursor: pointer;
+}
+
+button:active {
+  background-color: lightgrey;
+}
+
+#scramble {
+  top: 100px;
+  left: 800px;
+  color: red;
+}
+
+#reform {
+  top: 150px;
+  left: 800px;
+  color: blue;
+}
