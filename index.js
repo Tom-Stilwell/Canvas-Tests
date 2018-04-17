@@ -1,9 +1,4 @@
 document.addEventListener("DOMContentLoaded", () => {
-  var getOpenRecalls = function() {
-    console.log("recalls received");
-  };
-
-  getOpenRecalls();
   const canvasEl = document.getElementById("test-canvas");
   const ctx = canvasEl.getContext("2d");
   let W = window.innerWidth;
