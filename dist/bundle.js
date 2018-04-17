@@ -160,7 +160,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
       if (char.pos[1] > char.max) {
         makeChar(char.pos[0], 0, char.vel, char.max);
-        chars[i] = null;
+        chars = chars.slice(0, i).concat(chars.slice(i + 1, chars.length));
+        i--;
       }
       // if (char.pos[1] === 20) {
       //   if (counts[char.pos[0]] < 10) {
