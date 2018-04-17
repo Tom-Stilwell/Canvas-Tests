@@ -7,6 +7,7 @@ document.addEventListener("DOMContentLoaded", () => {
   canvasEl.height = H;
 
   const charSize = 20;
+  const color = [0, 255, 0];
 
   const characters = "1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ!@#$%^&*()";
 
@@ -26,6 +27,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   const chars = [];
+  const counts = {};
   // let char = randomChar();
   // let pos = [0, 0];
   // let velocity = 2;
@@ -34,15 +36,17 @@ document.addEventListener("DOMContentLoaded", () => {
   ctx.font = `${charSize}px Orbitron`;
 
   for (let i = 0; i < W; i += charSize) {
-    makeChar(i, randomVel(), Math.random() * H);
+    makeChar(i, 0, randomVel(), Math.random() * H, color);
+    counts[i] = 1;
   }
 
-  function makeChar(posX, vel, max) {
+  function makeChar(posX, posY, vel, max, fill) {
     chars.push({
       value: randomChar(),
-      pos: [posX, 0],
+      pos: [posX, posY],
       vel,
-      max
+      max,
+      fill
     });
   }
 
@@ -54,11 +58,23 @@ document.addEventListener("DOMContentLoaded", () => {
       if (char.pos[1] > char.max) {
         char.value = "";
       }
+      if (char.pos[1] + 2 * char.vel > char.max) {
+        ctx.fillStyle = "white";
+      } else {
+        ctx.fillStyle = "lime";
+      }
       ctx.fillText(char.value, ...char.pos);
       char.pos[1] += char.vel;
       if (char.pos[1] == 20) {
-        makeChar(char.pos[0], char.vel, char.max);
+        makeChar(char.pos[0], 0, char.vel, char.max);
       }
+      // if (char.pos[1] == 20) {
+      //   if (counts[char.pos[0]]++ % 40 < 20) {
+      //     makeChar(char.pos[0], 0, char.vel, char.max);
+      //   } else {
+      //     makeChar(char.pos[0], -100, char.vel, char.max);
+      //   }
+      // }
     }
   }
 
