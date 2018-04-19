@@ -87,10 +87,12 @@ document.addEventListener("DOMContentLoaded", () => {
   canvasEl.height = H;
 
   const charSize = Math.round(W / 70);
-  const strandLength = Math.round(H / 30);
+  const strandLength = Math.round(H / 40);
+  console.log(strandLength);
   const color = [0, 255, 0];
 
   const characters = "1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ!@#$%^&*()";
+  // const characters = "TOM";
 
   function randomChar() {
     return characters[Math.floor(Math.random() * characters.length)];
@@ -99,13 +101,12 @@ document.addEventListener("DOMContentLoaded", () => {
   function randomVel() {
     let factors = [];
 
-    for (let i = 1; i <= 4; i += 0.1) {
-      i = Math.round(10 * i) / 10;
+    for (let i = 1; i <= 4; i += 0.01) {
+      i = Math.round(100 * i) / 100;
       if (charSize % i === 0) {
         factors.push(i);
       }
     }
-
     return factors[Math.floor(Math.random() * factors.length)] * 0.5;
   }
 
