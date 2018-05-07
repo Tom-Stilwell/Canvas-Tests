@@ -1,4 +1,4 @@
-var anagramica = require("anagramica");
+import { dictionary } from "./dictionary.js";
 document.addEventListener("DOMContentLoaded", () => {
   const canvas = document.getElementById("test-canvas");
   const ctx = canvas.getContext("2d");
@@ -43,21 +43,31 @@ document.addEventListener("DOMContentLoaded", () => {
     drawLetters();
   });
 
+  let shuffle;
+
   document.getElementById("submit").addEventListener("click", () => {
-    if (letterCount >= 7) {
-      let searchLetters = letters.map(letter => letter.value).join("");
-      let waiting = true;
+    let searchLetters = letters.map(letter => letter.value).join("");
+    let found = false;
+    let anagram = setTimeout(() => {
       getAnagram(searchLetters);
-      const shuffle = setInterval(() => {
-        letters.forEach(letter => {
-          letter.value =
-            searchLetters[Math.floor(Math.random() * searchLetters.length)];
-        });
-        drawLetters();
-      }, 100);
-    } else {
-      alert("must input all letters");
-    }
+      found = true;
+    }, 2000);
+    debugger;
+    shuffle = setInterval(() => {
+      letters.forEach(letter => {
+        letter.value =
+          searchLetters[Math.floor(Math.random() * searchLetters.length)];
+      });
+      drawLetters();
+
+      if (found) {
+        clearInterval(shuffle);
+      }
+    }, 100);
+
+    debugger;
+
+
   });
 
   function drawLetters() {
@@ -83,21 +93,36 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  function getAnagram(searchLetters) {
-    // $.ajax({
-    //   type: "GET",
-    //   url: `http://api.datamuse.com/words?sl=${searchLetters}`
-    // }).then(value => {
-    //   debugger;
-    //   console.log("Contents: " + JSON.parse(value));
-    // });
+  const permutator = (inputArr) => {
+  let result = [];
 
-    anagramica.best("hodecat", (error, response) => {
-      if (error) {
-        console.log("error");
-      } else {
-        console.log(response.best);
+  const permute = (arr, m = []) => {
+    if (arr.length === 0) {
+      result.push(m);
+    } else {
+      for (let i = 0; i < arr.length; i++) {
+        let curr = arr.slice();
+        let next = curr.splice(i, 1);
+        permute(curr.slice(), m.concat(next));
+      }
+    }
+  };
+
+  permute(inputArr);
+
+  return result;
+ };
+
+  function getAnagram(searchLetters) {
+    let permutations = permutator(searchLetters.split(""));
+    let anagram;
+    debugger
+    permutations.forEach((perm) => {
+      if (dictionary.includes(perm.join(""))) {
+        anagram = perm.join("");
       }
     });
+    debugger
+    return anagram;
   }
 });
