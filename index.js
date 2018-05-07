@@ -8,6 +8,11 @@ document.addEventListener("DOMContentLoaded", () => {
   canvas.width = W;
   canvas.height = H;
 
+  // const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+  // function randomChar() {
+  //   return chars[Math.floor(Math.random() * chars.length)];
+  // }
+
   ctx.font = "30px Arial";
   ctx.textBaseline = "top";
   ctx.fillText("Type your anagram:", 10, 50);
@@ -40,7 +45,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
   document.getElementById("submit").addEventListener("click", () => {
     if (letterCount >= 7) {
-      getAnagram();
+      let searchLetters = letters.map(letter => letter.value).join("");
+      let waiting = true;
+      getAnagram(searchLetters);
+      const shuffle = setInterval(() => {
+        letters.forEach(letter => {
+          letter.value =
+            searchLetters[Math.floor(Math.random() * searchLetters.length)];
+        });
+        drawLetters();
+      }, 100);
     } else {
       alert("must input all letters");
     }
@@ -69,9 +83,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  function getAnagram() {
-    let searchLetters = letters.map(letter => letter.value).join("");
-    debugger;
+  function getAnagram(searchLetters) {
     // $.ajax({
     //   type: "GET",
     //   url: `http://api.datamuse.com/words?sl=${searchLetters}`
