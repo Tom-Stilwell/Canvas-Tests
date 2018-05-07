@@ -1,114 +1,91 @@
+var anagramica = require("anagramica");
 document.addEventListener("DOMContentLoaded", () => {
-  const canvasEl = document.getElementById("test-canvas");
-  const ctx = canvasEl.getContext("2d");
-  let W = window.innerWidth;
-  let H = window.innerHeight;
-  canvasEl.width = W;
-  canvasEl.height = H;
+  const canvas = document.getElementById("test-canvas");
+  const ctx = canvas.getContext("2d");
+  const W = window.innerWidth;
+  const H = window.innerHeight;
 
-  const charSize = Math.round(W / 70);
-  const strandLength = Math.round(H / 40);
-  console.log(strandLength);
-  const color = [0, 255, 0];
+  canvas.width = W;
+  canvas.height = H;
 
-  const characters = "1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ!@#$%^&*()";
-  // const characters = "TOM";
-
-  function randomChar() {
-    return characters[Math.floor(Math.random() * characters.length)];
-  }
-
-  function randomVel() {
-    let factors = [];
-
-    for (let i = 1; i <= 4; i += 0.01) {
-      i = Math.round(100 * i) / 100;
-      if (charSize % i === 0) {
-        factors.push(i);
-      }
-    }
-    return factors[Math.floor(Math.random() * factors.length)] * 0.5;
-  }
-
-  // function randomVel() {
-  //   return (Math.floor(Math.random() * 90) + 10) * 0.5;
-  // }
-
-  let chars = {};
-  const counts = {};
-  let id = 0;
-
-  ctx.fillStyle = "lime";
+  ctx.font = "30px Arial";
   ctx.textBaseline = "top";
-  ctx.font = `${charSize}px Orbitron`;
-
-  for (let i = 0; i < W; i += charSize) {
-    makeChar(
-      i,
-      0,
-      randomVel(),
-      Math.random() * (H - charSize * strandLength) + charSize * strandLength
-    );
-    counts[i] = 1;
-  }
-
-  function makeChar(posX, posY, vel, max) {
-    counts[posX]++;
-    id++;
-    let fill = Math.floor(
-      255 * (1 - ((counts[posX] - 1) % strandLength) / strandLength)
-    );
-    chars[id] = {
-      id,
-      value: randomChar(),
-      pos: [posX, posY],
-      vel,
-      max,
-      fill
+  ctx.fillText("Type your anagram:", 10, 50);
+  const letters = new Array(7);
+  let letterCount = 0;
+  for (let i = 0; i < letters.length; i++) {
+    letters[i] = {
+      value: "",
+      posX: 10 + i * 30,
+      posY: 100
     };
   }
 
-  function draw() {
-    ctx.clearRect(0, 0, W, H);
+  drawLetters();
+  let bestWord;
 
-    let switcher = chars[Math.floor(Math.random() * 400 + id - 400)];
-
-    if (switcher !== undefined) {
-      switcher.value = randomChar();
+  document.addEventListener("keypress", event => {
+    if (letterCount >= 7) {
+      return;
     }
+    letters[letterCount].value = event.key;
+    drawLetters();
+    letterCount++;
+  });
 
-    let char;
-    for (var key in chars) {
-      if (!chars.hasOwnProperty(key)) continue;
+  document.getElementById("reset").addEventListener("click", () => {
+    resetLetters();
+    drawLetters();
+  });
 
-      char = chars[key];
-      ctx.save();
+  document.getElementById("submit").addEventListener("click", () => {
+    if (letterCount >= 7) {
+      getAnagram();
+    } else {
+      alert("must input all letters");
+    }
+  });
 
-      if (char.pos[1] + 5 * char.vel > char.max) {
-        ctx.fillStyle = "white";
+  function drawLetters() {
+    ctx.clearRect(0, 95, canvas.width, canvas.height - 100);
+
+    letters.forEach(letter => {
+      if (letter.value === "") {
+        ctx.beginPath();
+        ctx.strokeStyle = "grey";
+        ctx.rect(letter.posX, letter.posY, 24, 30);
+        ctx.stroke();
+        ctx.closePath();
       } else {
-        ctx.fillStyle = `rgb(0, ${char.fill}, 0)`;
+        ctx.fillText(letter.value, letter.posX, letter.posY);
       }
-
-      ctx.fillText(char.value, ...char.pos);
-      ctx.restore();
-      char.pos[1] += char.vel;
-
-      if (char.pos[1] === charSize && counts[char.pos[0]] < strandLength) {
-        makeChar(char.pos[0], 0, char.vel, char.max);
-      }
-
-      if (char.pos[1] > char.max) {
-        makeChar(char.pos[0], 0, char.vel, char.max);
-        delete chars[char.id];
-      }
-    }
+    });
   }
 
-  function animate() {
-    draw();
-    requestAnimationFrame(animate);
+  function resetLetters() {
+    letterCount = 0;
+    letters.forEach(letter => {
+      letter.value = "";
+    });
   }
 
-  requestAnimationFrame(animate);
+  function getAnagram() {
+    let searchLetters = letters.map(letter => letter.value).join("");
+    debugger;
+    // $.ajax({
+    //   type: "GET",
+    //   url: `http://api.datamuse.com/words?sl=${searchLetters}`
+    // }).then(value => {
+    //   debugger;
+    //   console.log("Contents: " + JSON.parse(value));
+    // });
+
+    anagramica.best("hodecat", (error, response) => {
+      if (error) {
+        console.log("error");
+      } else {
+        console.log(response.best);
+      }
+    });
+  }
 });
