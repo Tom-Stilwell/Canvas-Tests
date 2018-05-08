@@ -16,7 +16,7 @@ document.addEventListener("DOMContentLoaded", () => {
   ctx.font = "30px Arial";
   ctx.textBaseline = "top";
   ctx.fillText("Type your anagram:", 10, 50);
-  const letters = new Array(7);
+  const letters = new Array(10);
   let letterCount = 0;
   for (let i = 0; i < letters.length; i++) {
     letters[i] = {
@@ -29,14 +29,23 @@ document.addEventListener("DOMContentLoaded", () => {
   drawLetters();
   let bestWord;
 
-  document.addEventListener("keypress", event => {
-    if (letterCount >= 7) {
-      return;
+  document.addEventListener("keydown", event => {
+    if (event.key === "Backspace") {
+      if (letterCount <= 0) {
+        return;
+      }
+      letterCount--;
+      letters[letterCount].value = "";
     }
-    letters[letterCount].value = event.key;
+    else if (letterCount >= letters.length) {
+      return;
+    } else {
+      letters[letterCount].value = event.key;
+      letterCount++;
+    }
     drawLetters();
-    letterCount++;
   });
+
 
   document.getElementById("reset").addEventListener("click", () => {
     resetLetters();
@@ -47,25 +56,34 @@ document.addEventListener("DOMContentLoaded", () => {
 
   document.getElementById("submit").addEventListener("click", () => {
     let searchLetters = letters.map(letter => letter.value).join("");
-    let found = false;
-    let anagram = setTimeout(() => {
-      getAnagram(searchLetters);
-      found = true;
+    let anagram;
+    setTimeout(() => {
+      anagram = getAnagram(searchLetters) || "not found ";
+
     }, 2000);
-    debugger;
+
     shuffle = setInterval(() => {
       letters.forEach(letter => {
-        letter.value =
-          searchLetters[Math.floor(Math.random() * searchLetters.length)];
+        if (letter.value !== "") {
+          letter.value =
+            searchLetters[Math.floor(Math.random() * searchLetters.length)];
+        }
       });
       drawLetters();
 
-      if (found) {
+      if (anagram) {
         clearInterval(shuffle);
+
+        anagram = anagram.split("");
+
+        letters.forEach( (letter) => {
+          letter.value = anagram.shift() || "";
+        });
+        drawLetters();
       }
     }, 100);
 
-    debugger;
+
 
 
   });
@@ -116,13 +134,12 @@ document.addEventListener("DOMContentLoaded", () => {
   function getAnagram(searchLetters) {
     let permutations = permutator(searchLetters.split(""));
     let anagram;
-    debugger
     permutations.forEach((perm) => {
       if (dictionary.includes(perm.join(""))) {
         anagram = perm.join("");
       }
     });
-    debugger
+
     return anagram;
   }
 });
